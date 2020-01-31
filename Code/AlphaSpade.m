@@ -6,12 +6,18 @@ clear
 close all
 addpath('./Functions');
 
-name  ='niko_paris_02';
-name  ='test'; % If name = 'test', the logfile will be overwritten without warning.
+name  ='test';
 
 % Initialize the INFO struct. This is basically our logfile.
-INFO.name              = name;
-INFO.logfilename       = ['Logfiles' filesep name '_Logfile.mat'];
+INFO.name = name;
+now_is_the_time = datestr(now, 'yyyy-mm-dd_HHMM');
+INFO.logfilename = fullfile('./Logfiles', [
+    now_is_the_time, ...
+    '_', name, ...
+    '_logfile.mat'
+    ]);
+
+INFO.tStart = now_is_the_time;
 
 % Load the parameters. All the specific setting about stimulus size,
 % duration etc. is in the INFO.P struct.
@@ -91,8 +97,6 @@ end
 % Run across trials.
 %----------------------------------------------------------------------
 fprintf('\nNow running %d trials.\n\n', length(INFO.T));
-
-INFO.tStart = {datestr(clock)};
 isQuit = false;
 tic;
 
