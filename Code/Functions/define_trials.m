@@ -10,11 +10,14 @@ itrial = 0;
 for irepeat = 1:P.paradigm.n_trials
     for itarg = 1:length(P.paradigm.target)
         itrial = itrial + 1;
-        T(itrial).target = P.paradigm.target(itarg);
         
+        T(itrial).trial = [];
+        T(itrial).target = P.paradigm.target(itarg);      
         
         % Initalize other parameter values that do not need
-        % counterbalancing.
+        % counterbalancing. This is useful for having the struct fields in
+        % a meaningful order; it facilitates reading the logfile table.
+        T(itrial).contrast = [];
         T(itrial).button = [];
         T(itrial).correct = [];
         T(itrial).report = [];
@@ -24,7 +27,8 @@ for irepeat = 1:P.paradigm.n_trials
         T(itrial).t_display_off = [];
         T(itrial).dur_display = [];
         T(itrial).thresh_estimate = [];
-        T(itrial).thresh_sd = [];        
+        T(itrial).thresh_sd = [];    
+        T(itrial).trial_completed = [];
     end
 end
 

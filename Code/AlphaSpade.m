@@ -102,7 +102,7 @@ tic;
 
 for itrial = 1:length(INFO.T)
     
-    INFO.T(itrial).itrial = itrial;
+    INFO.T(itrial).trial = itrial;
     
     %-------------------------------------------------
     % Present a break if necessary.
