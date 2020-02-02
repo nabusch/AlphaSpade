@@ -13,7 +13,7 @@ switch INFO.P.do_testrun
         
         % Calcualte response time.
         if P.do_testrun == 0
-            T.rt = secs - (T.t_display_on + T.soa);
+            T.rt = secs - (T.t_target_on + T.t_trial_on);
         end
         
     otherwise
@@ -26,7 +26,7 @@ switch INFO.P.do_testrun
         if response == 1 && T.target == -1 % left hit
             T.button = 1;
         elseif response == 1 && T.target == 1 % right hit
-            T.button = 3; 
+            T.button = 3;
         elseif response == 1 && T.target == 0 % false alarm
             T.button = 1 + 2*round(rand); % make left/right false alarms at random
         elseif response == 0
@@ -34,10 +34,21 @@ switch INFO.P.do_testrun
         end
 end
 
+if isQuit
+    return
+end
+
 % So far the button presses are called 1/2/3. We recode them to -1/0/+1, so
 % that they use the same scheme as the variable coding target location.
 T.button = P.paradigm.target(T.button);
 
+% Send trigger.
+if P.setup.isEEG
+    trig = 100 + T.button;
+    SendTrigger(trig, P.trigger.trig_dur);
+end
+
+% Code correctness.
 if T.button == T.target
     T.correct = 1;
 else

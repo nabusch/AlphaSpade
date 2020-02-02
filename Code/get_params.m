@@ -12,7 +12,7 @@ switch computername
         myres = Screen('Resolution', thescreen);
         
         P.screen.screen_num   = thescreen;% 0 is you have only one screen (like a laptop) 1 or 2 if you have multiple screens one is usually the matlab screen
-        P.screen.size         = [36 27]; %screen size in centimeters.
+        P.screen.size         = [47 30];%[36 27]; %screen size in centimeters.
         P.screen.viewdist     = 55; % distance between subject and monitor
         
         P.setup.isEEG         = 0;
@@ -45,7 +45,7 @@ P.screen.buffer       = 0.5 * P.screen.frameint; % request a flip slightly earli
 % if==1, show stimuli, but do not wait for button presses.
 % if==2, completely bypass one_trial, do not show stimuli, and simulate
 % behavior.
-P.do_testrun = 2;
+P.do_testrun = 0;
 
 % Note: from this line onwards, variables coding the size of things
 % indicate size in degrees visual angle. Internally, the functions
@@ -61,7 +61,7 @@ P.do_testrun = 2;
 P.screen.cx = round(P.screen.width/2); % x coordinate of screen center
 P.screen.cy = round(P.screen.height/2); % y coordinate of screen center
 
-[P.screen.pixperdeg, P.screen.degperpix] = VisAng(P);
+[P.screen.pixperdeg, P.screen.degperpix] = vis_ang(P);
 P.screen.pixperdeg = mean(P.screen.pixperdeg);
 P.screen.degperpix = mean(P.screen.degperpix);
 
@@ -73,25 +73,46 @@ P.screen.black = BlackIndex(P.screen.screen_num);
 %% -----------------------------------------------------------------------
 % Parameters of the display and stimuli
 % ------------------------------------------------------------------------
-P.stim.background_color = [70 70 70];
-P.stim.target_size = [];
-P.stim.target_ecc = [];
+P.stim.background_color = [0 0 0];
 
-P.GaborParameters.amp      = 0.1;        % amplitude; -amp/2:+amp/2, so 1 means full contrast
-P.GaborParameters.frq      = 2.5/P.screen.pixperdeg;      % spatial frequency [cycles/deg]    - a big number gives you
-P.GaborParameters.pha      = pi;     % phase [radians]
-P.GaborParameters.siz      = P.stim.target_size * P.screen.pixperdeg;      % extent of the stimulus from center to border [deg]
-P.GaborParameters.siz      = ceil(P.GaborParameters.siz);
-P.GaborParameters.sig      = 0.2*P.GaborParameters.siz;      % std.dev. of Gaussian envelope [deg]
-P.GaborParameters.fNyquist = 0.5;
-P.GaborParameters.Tilt     = 5; %10 original % orientation [radians] - 0 and pi are vertical, pi/2 and 3*pi/2 are horizontal
+P.stim.fix_size = 0.4;
+P.stim.fix_color = [100 100 100];
 
+P.stim.target_size = 0.3; % in degree % 0.25
+P.stim.target_ecc  = 10; % in degree
+P.stim.target_loc  = 100; % in degrees, not radians.
+% 135: 17:30 o'clock
+
+
+% Paramters and stimulus generation for the Gabor taken from:
+% https://peterscarfe.com/gabordemo.html
+
+% Dimension of the region where will draw the Gabor in pixels
+P.gabor_params.size = ceil(P.stim.target_size * P.screen.pixperdeg);
+P.gabor_params.sigma = P.gabor_params.size / 5; % Sigma of Gaussian
+P.gabor_params.orientation = 0;
+P.gabor_params.contrast = 0.8;
+P.gabor_params.aspectRatio = 1.0;
+P.gabor_params.phase = 270; % at 270, we see two equally bright stripes.
+
+% Spatial Frequency (Cycles Per Pixel)
+% One Cycle = Grey-Black-Grey-White-Grey i.e. One Black and One White Lobe
+numCycles = 2;
+P.gabor_params.freq = numCycles / P.gabor_params.size;
+P.gabor_params.backgroundOffset = [0 0 0 0.0];%[0.5 0.5 0.5 0.0];
+P.gabor_params.disableNorm = 1;
+P.gabor_params.preContrastMultiplier = 1;
+
+P.noise.do_noise   = 1;
+P.noise.noise_mean = 5;
+P.noise.noise_max  = 3*P.noise.noise_mean;
+P.noise.noise_sd   = 5;
 
 
 %% -----------------------------------------------------------------------
 % Parameters of the paradigm, procedure & timing
 %  -----------------------------------------------------------------------
-P.paradigm.n_trials  = 100; % per permutation of all conditions
+P.paradigm.n_trials  = 20; % per permutation of all conditions
 P.paradigm.break_after_x_trials = 30;    % Present a break after so many trials.
 P.paradigm.target = [-1 0 1]; 
 P.paradigm.conditions = {
@@ -100,6 +121,13 @@ P.paradigm.conditions = {
 'err_LR'  'fal_0R'  'hit_RR'    
 };
 
+P.paradigm.target_dur = 0.040;
+P.paradigm.target_off_prompt_on_delay = 0.500;
+
+% Timing of the prestimulus screen.
+P.paradigm.dur_prestim_mean = 1.8;
+P.paradigm.dur_prestim_min  = 1.200;
+P.paradigm.dur_prestim_max  = 3.500;
 
 %% -----------------------------------------------------------------------
 % Trigger parameters
@@ -115,16 +143,16 @@ P.trigger.trig_stop  = 251;
 %  ------------------------------------------------------------------------
 KbName('UnifyKeyNames');
 P.keys.quitkey = KbName('ESCAPE');
-P.key.lkey  = KbName('LeftArrow');
-P.key.rkey  = KbName('RightArrow');
-P.key.nokey = KbName('UpArrow');
+P.keys.lkey  = KbName('LeftArrow');
+P.keys.rkey  = KbName('RightArrow');
+P.keys.nokey = KbName('UpArrow');
 
 
 
 %% -----------------------------------------------------------------------
 % Parameters of the Quest
 % ------------------------------------------------------------------------
-P.quest.guess      = log10(0.2);
+P.quest.guess      = log10(0.9);
 P.quest.std        = 8; % a priori standard deviation of the guess. manual suggests to be generous here
 P.quest.pthreshold = 0.6; % threshold criterior for response = 1
 P.quest.beta       = 3.5; % slope of psychometric function

@@ -6,7 +6,7 @@ clear
 close all
 addpath('./Functions');
 
-name  ='test';
+name  ='nikonoise';
 
 % Initialize the INFO struct. This is basically our logfile.
 INFO.name = name;
@@ -77,8 +77,17 @@ if INFO.P.do_testrun < 2
         load(INFO.P.setup.CLUTfile);
         Screen('LoadNormalizedGammaTable',win,inverseCLUT);
     end
+        
+    % Make the Gabor texture. We only need to create the texture once. We can
+    % reuse it in every trial and still modify orientation, contrast, etc.
+    [gabor_id, gabor_rect]  = CreateProceduralGabor(win, ...
+        INFO.P.gabor_params.size, INFO.P.gabor_params.size, [],...
+        INFO.P.gabor_params.backgroundOffset, INFO.P.gabor_params.disableNorm, ...
+        INFO.P.gabor_params.preContrastMultiplier);
     
-    HideCursor
+    if INFO.P.do_testrun == 0
+        HideCursor
+    end
 end
 
 
@@ -136,16 +145,21 @@ for itrial = 1:length(INFO.T)
             % do nothing, just simulation.
         otherwise
             % really present stimuli on the screen.
-            INFO = one_trial_loop(INFO, win, itrial);
+            %             INFO = one_trial_loop(INFO, win, itrial);
+            INFO.T(itrial) = show_stimuli(INFO.T(itrial), INFO.P, win, ...
+            gabor_id, gabor_rect);
     end
     
     %-------------------------------------------------
-    % Get the behavioral response for this trial.
+    % Get the behavioral response for this trial. Quit if requested.
     %-------------------------------------------------
     [INFO, isQuit] = get_response(INFO, itrial);
+    fprintf(' Duration: %1.3f; Report: %s\n', INFO.T(itrial).target_dur,INFO.T(itrial).report);
     
-    fprintf(' Report: %s\n', INFO.T(itrial).report);
-    
+    if isQuit==1
+        close_and_cleanup(INFO.P)
+        break
+    end
     %-------------------------------------------------
     % Update Quest with results from this trial, but only if there was a target.
     %-------------------------------------------------
@@ -157,17 +171,13 @@ for itrial = 1:length(INFO.T)
     
     %
     %-------------------------------------------------
-    % Save results for this trial or quit the experiment.
-    %-------------------------------------------------
-    if isQuit==1
-        close_and_cleanup(INFO.P)
-        break
-    else
-        INFO.T(itrial).trial_completed = 1;
-        INFO.ntrials = itrial;
-        INFO.tTotal  = toc;
-        INFO.tFinish = {datestr(clock)};
-    end
+    % Save results for this trial.
+    %-------------------------------------------------    
+    INFO.T(itrial).trial_completed = 1;
+    INFO.ntrials = itrial;
+    INFO.tTotal  = toc;
+    INFO.tFinish = {datestr(clock)};
+
     
     % Do not save data now if this is a testrun; this would slow down too
     % much.

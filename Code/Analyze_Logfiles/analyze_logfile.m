@@ -1,17 +1,15 @@
 clear; close all; clc
-addpath(genpath('./raacampbell-notBoxPlot-7d90c27/'))
 
 % Make sure you are really in the "Analyze_logfiles" subdirectory!
 log_dir = '../Logfiles/';
 
 % Automatically read all files with names of a specific pattern.
-files = extractfield(dir([log_dir, '*_test*']), 'name');
+files = extractfield(dir([log_dir, '*_nikonoise*']), 'name');
 
 % Alternatively, list files explicitly.
 % files = {
-%     '2020-01-31_1218_test_logfile.mat'
-%     '2020-01-31_1219_test_logfile.mat'
-%     '2020-01-31_1220_test_logfile.mat'
+%     '2020-02-01_1718_niko_logfile'
+%     '2020-02-01_1722_niko_logfile'
 %     };
 
 LOG = load_logfiles(files, log_dir);
