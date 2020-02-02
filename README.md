@@ -6,6 +6,12 @@ I store all information about an experiment in a struct called `INFO` with subfi
 - `T` the **t** rials, i.e. which condition happened on which trial, what was the response etc.
 - `Q` the **Q** uest, i.e. parameters and logfile for the staircase procedure.
 
+You can do a rudimentary analysis (basic data visualization) using the script analyze_logfiles in the AnalyzeLogfiles directory. This script gives you two images, showing you accuracy
+
+![accuracy](/accuracy_kcs3i2gt1.jpg)
+
+
+
 ## Trigger logic
 Although I have not implemented the function for actually sending triggers, I do put together the codes that should be sent as triggers. We want to mark the following events with triggers:
 - 10: trial onset;
