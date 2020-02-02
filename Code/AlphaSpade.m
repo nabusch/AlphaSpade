@@ -6,7 +6,7 @@ clear
 close all
 addpath('./Functions');
 
-name  ='nikonoise';
+name  ='test';
 
 % Initialize the INFO struct. This is basically our logfile.
 INFO.name = name;

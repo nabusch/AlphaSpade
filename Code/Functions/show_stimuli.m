@@ -6,9 +6,9 @@ function T = show_stimuli(T, P, win, gabor_id, gabor_rect)
 % noise is presented (easier to communicate to the make_background
 % function.
 % --------------------------------------------------------
-noise_img = (P.noise.noise_sd*randn(P.screen.height, P.screen.width) + P.noise.noise_mean);
+noise_img = (P.stim.noise_sd*randn(P.screen.height, P.screen.width) + P.stim.noise_mean);
 noise_img(noise_img<0) = 0;
-noise_img(noise_img>P.noise.noise_max) = P.noise.noise_max;
+noise_img(noise_img>P.stim.noise_max) = P.stim.noise_max;
 noise_tex = Screen('MakeTexture', win, noise_img);
 
 

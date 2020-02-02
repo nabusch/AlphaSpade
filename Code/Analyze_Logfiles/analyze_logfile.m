@@ -4,7 +4,7 @@ clear; close all; clc
 log_dir = '../Logfiles/';
 
 % Automatically read all files with names of a specific pattern.
-files = extractfield(dir([log_dir, '*_nikonoise*']), 'name');
+files = extractfield(dir([log_dir, '*_nikonoisejitter*']), 'name');
 
 % Alternatively, list files explicitly.
 % files = {
